@@ -1,3 +1,4 @@
 gitignoretest.py
-.venv/
+venv/
+
 
