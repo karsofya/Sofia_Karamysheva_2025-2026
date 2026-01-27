@@ -1,9 +1,0 @@
-print("Hello, World")
-print("lalala")
-print("123")
-print("ka")
-print("sofia")
-print("ediens")
-print("pankukas")
-
-print("hello")
