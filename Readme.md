@@ -1,3 +1,5 @@
+Konceptuālais modelis: 
+https://www.canva.com/design/DAG5mFVNTck/D_w1rZ2OGDTsOdprxP7zeg/edit
 Digitālais informācijas panelis ir personisks un interaktīvs rīks,
 kas ļauj lietotājam uzreiz pārskatīt un organizēt svarīgāko ikdienas informāciju vienā centrālā vietā. Tā mērķis ir uzlabot lietotāja 
 laika plānošanu, produktivitāti un informācijas pārvaldību, piedāvājot vienkāršu, vizuāli pievilcīgu un lietotājam draudzīgu saskarni.
