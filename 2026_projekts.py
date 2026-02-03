@@ -8,18 +8,16 @@ import pandas as pd
 import time
 from datetime import date, datetime
 
-# ================= PAGE =================
 st.set_page_config(
     page_title="Digitālais informācijas panelis",
     layout="wide"
 )
 
-# ================= THEME =================
 if "theme" not in st.session_state:
     st.session_state.theme = "Light"
 
 with st.sidebar:
-    st.header("⚙️ Iestatījumi")
+    st.header("Iestatījumi")
 
     theme = st.radio(
         "Izvēlies režīmu",
@@ -28,11 +26,11 @@ with st.sidebar:
     )
     st.session_state.theme = theme
 
-    if st.button("🔄 Atsvaidzināt paneli"):
+    if st.button(" Atsvaidzināt paneli"):
         st.cache_data.clear()
         st.rerun()
 
-# Dark mode stils
+
 if st.session_state.theme == "Dark":
     st.markdown("""
         <style>
@@ -43,17 +41,15 @@ if st.session_state.theme == "Dark":
         </style>
     """, unsafe_allow_html=True)
 
-# ================= TITLE =================
-st.title("📊 Digitālais informācijas panelis")
 
-# ================= CLOCK =================
+st.title(" Digitālais informācijas panelis")
+
 clock = st.empty()
 now = datetime.now()
 clock.markdown(
     f"### 🕒 {now.strftime('%H:%M:%S')} | 📅 {now.strftime('%d.%m.%Y')}"
 )
 
-# ================= WEATHER =================
 @st.cache_data(ttl=300)
 def get_weather(city):
     url = f"https://wttr.in/{city}?format=j1"
@@ -63,7 +59,7 @@ def get_weather(city):
 col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader("🌤️ Laikapstākļi")
+    st.subheader("Laikapstākļi")
 
     CITY = "Riga"
 
@@ -80,9 +76,9 @@ with col1:
     except Exception:
         st.error("Nevar iegūt laikapstākļu datus")
 
-# ================= HOMEWORK =================
+
 with col2:
-    st.subheader("📚 Mājasdarbi")
+    st.subheader("Mājasdarbi")
 
     majasdarbi_data = {
         "Priekšmets": ["Angļu valoda", "Matemātika", "Latviešu valoda"],
@@ -101,8 +97,7 @@ with col2:
 
     st.table(df)
 
-# ================= NOTES =================
-st.subheader("📌 Ātrās piezīmes")
+st.subheader("Ātrās piezīmes")
 
 if "notes" not in st.session_state:
     st.session_state.notes = ""
@@ -113,8 +108,8 @@ st.session_state.notes = st.text_area(
     height=120
 )
 
-# ================= CHART =================
-st.subheader("📈 Datu grafiks")
+
+st.subheader("Datu grafiks")
 
 chart_data = [random.randint(10, 50) for _ in range(20)]
 st.line_chart(chart_data)
