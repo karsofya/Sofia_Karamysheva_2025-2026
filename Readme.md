@@ -1,5 +1,21 @@
 Konceptuālais modelis: 
-https://www.canva.com/design/DAG5mFVNTck/D_w1rZ2OGDTsOdprxP7zeg/edit
+https://www.canva.com/design/DAHA2_dy_1Q/EhjGU5iwLxaJDN0iCdjsQQ/edit?utm_content=DAHA2_dy_1Q&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+Lietojumprogrammas loģikas slānis nodrošina visu sistēmas funkcionālo darbību. Tas apstrādā lietotāja darbības, piemēram, tēmas maiņu un paneļa atsvaidzināšanu, 
+kā arī veic nepieciešamos aprēķinus un datu sagatavošanu attēlošanai. Šajā slānī tiek apstrādāts aktuālais datums un laiks, aprēķināts dienu skaits 
+līdz mājasdarbu izpildes termiņiem, kā arī ģenerēti dati līniju grafikam. Kļūdu apstrāde ir ieviesta, lai nodrošinātu lietotnes stabilu darbību gadījumos, 
+kad ārējie datu avoti nav pieejami.
+
+Datu avotu slānis sastāv no ārējiem un iekšējiem datiem. Ārējie dati tiek iegūti no laikapstākļu tīmekļa pakalpojuma wttr.in, kas nodrošina informāciju 
+par aktuālo temperatūru, sajūtu kā temperatūru un laikapstākļu aprakstu. Iekšējie dati tiek glabāti pašā lietojumprogrammā un ietver mājasdarbu sarakstu, 
+kas strukturēts Pandas DataFrame formātā, kā arī nejauši ģenerētus skaitliskus datus grafika attēlošanai.
+
+Stāvokļa un veiktspējas pārvaldībai tiek izmantoti Streamlit mehānismi st.session_state un st.cache_data. Sesijas stāvoklis nodrošina lietotāja iestatījumu, 
+piemēram, izvēlētās tēmas un ievadīto piezīmju saglabāšanu lietošanas laikā. Kešatmiņa tiek izmantota laikapstākļu datu saglabāšanai noteiktu laika periodu,
+tādējādi samazinot atkārtotu ārējo API pieprasījumu skaitu un uzlabojot lietojumprogrammas darbības ātrumu.
+
+Kopumā lietojumprogramma ir izstrādāta kā monolīta tīmekļa lietotne bez atsevišķas datubāzes, kurā visi komponenti darbojas vienotā izpildes vidē. 
+Šāda arhitektūra ir piemērota neliela mēroga projektiem, mācību nolūkiem un prototipiem, jo tā ir vienkārši uzturama, 
+viegli paplašināma un nodrošina skaidru struktūru starp lietotāja interfeisu, loģiku un datu apstrādi.
 Digitālais informācijas panelis ir personisks un interaktīvs rīks,
 kas ļauj lietotājam uzreiz pārskatīt un organizēt svarīgāko ikdienas informāciju vienā centrālā vietā. Tā mērķis ir uzlabot lietotāja 
 laika plānošanu, produktivitāti un informācijas pārvaldību, piedāvājot vienkāršu, vizuāli pievilcīgu un lietotājam draudzīgu saskarni.
@@ -68,9 +84,54 @@ streamlit run 2026_projekts.py
 Nepieciešams interneta pieslēgums laikapstākļu datu iegūšanai.
 
 Darba plāns:
-2.02.2026 Specifikācija
-4.03.2026 Funkcionalitātes pabeigšana, tostarp, jaunas funkcijas un iespēja modificēt lietotni saviem nolukiem.
-31.03.2026 UI un Frontend nobeigšana, tostarp dizains un iespēja modifiēt lietotni uz lietotāja velmi
-21.04.2026 Testēšana un DeBug funkcionalitāte
-8.05.2026 beigu projekta prezentācija
+02.02.2026 – Projekta specifikācija
+      *Definēt projekta mērķi un uzdevumus
+      *Aprakstīt galvenās lietotnes funkcijas
+      *Izvēlēties izmantotās tehnoloģijas (Python, Streamlit, API)
+      *Izstrādāt konceptuālo arhitektūras modeli
+16.02.2026 – Pamata struktūras pilnveidošana
+      *Uzlabot Streamlit projekta struktūru, sadalot kodu loģiskos blokos
+      *Paplašināt galveno izkārtojumu, lai tas atbalstītu dinamisku sadaļu parādīšanu
+      *Papildināt tēmas pārslēgšanu ar lietotāja iestatījumu saglabāšanu
+      *Paplašināt session_state, lai saglabātu lietotāja izvēles par redzamajām funkcijām
+04.03.2026 – Funkcionalitātes paplašināšana
+      *Izveidot iespēju lietotājam izvēlēties, kuras funkcijas tiek rādītas panelī  
+      *Pievienot iespēju rediģēt mājasdarbu datus (pievienot, dzēst, labot) 
+      *Izveidot iespēju mainīt laikapstākļu pilsētu
+      *Pievienot iespēju pielāgot grafika attēlotos datus
+      *Saglabāt lietotāja pielāgojumus sesijā
+
+18.03.2026 – Paplašinātās funkcijas
+      *e-Klases datu integrācijas prototips
+      *Mājasdarbu vai stundu saraksta attēlošana
+      *Iespēja manuāli pievienot / dzēst mājasdarbus
+      *Datu kešošanas optimizācija
+      *Kļūdu apstrādes uzlabošana
+
+31.03.2026 – UI un Frontend pabeigšana
+      *Lietotnes dizaina pilnveide
+      *Tumšā režīma uzlabošana
+      *Lietotāja saskarnes loģikas uzlabošana
+      *Iespēja pielāgot paneli lietotāja vajadzībām
+
+10.04.2026 – Lietotāja pielāgojumi
+      *Iespēja izvēlēties pilsētu laikapstākļiem
+      *Iespēja mainīt valodu (LV / EN)
+      *Individuālu iestatījumu saglabāšana sesijā
+
+21.04.2026 – Testēšana un Debug
+    *Funkcionalitātes testēšana
+    *e-Klases integrācijas pārbaude
+    *Kļūdu labošana
+    *Veiktspējas uzlabošana
+
+01.05.2026 – Projekta gala versija
+      *Koda sakārtošana un dokumentēšana
+      *Projekta apraksta sagatavošana
+      *Lietotnes sagatavošana demonstrācijai
+
+08.05.2026 – Beigu projekta prezentācija
+      *Gatavās lietotnes demonstrācija
+      *Funkciju izskaidrošana
+      *Secinājumi un nākotnes uzlabojumi
   
