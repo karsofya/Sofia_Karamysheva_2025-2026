@@ -14,7 +14,6 @@ st.set_page_config(
     layout="wide"
 )
 
-
 def init_session_state():
     defaults = {
         "theme": "Light",
@@ -22,14 +21,15 @@ def init_session_state():
         "show_weather": True,
         "show_homework": True,
         "show_notes": True,
-        "show_chart": True
+        "show_chart": True,
+        "debug_mode": False,
+        "force_error": False
     }
     for key, value in defaults.items():
         if key not in st.session_state:
             st.session_state[key] = value
 
 init_session_state()
-
 
 def apply_theme():
     if st.session_state.theme == "Dark":
@@ -43,7 +43,6 @@ def apply_theme():
         """, unsafe_allow_html=True)
 
 apply_theme()
-
 
 def render_sidebar():
     with st.sidebar:
@@ -72,16 +71,25 @@ def render_sidebar():
         )
 
         st.divider()
+        st.subheader("Testēšana")
+
+        st.session_state.debug_mode = st.checkbox(
+            "Debug režīms",
+            st.session_state.debug_mode
+        )
+
+        if st.button("Simulēt API kļūdu"):
+            st.session_state.force_error = True
+
         if st.button("Atsvaidzināt paneli"):
             st.cache_data.clear()
+            st.session_state.force_error = False
             st.rerun()
 
 render_sidebar()
 
-
 def render_header():
     st.title("Digitālais informācijas panelis")
-
     now = datetime.now()
     st.markdown(
         f"### {now.strftime('%H:%M:%S')} | {now.strftime('%d.%m.%Y')}"
@@ -89,16 +97,18 @@ def render_header():
 
 render_header()
 
-
 @st.cache_data(ttl=300)
 def get_weather(city):
-    """
-    ONLINE režīms – izmanto wttr.in API
-    OFFLINE testam šo funkciju var aizvietot ar fiksētiem datiem
-    """
-    url = f"https://wttr.in/{city}?format=j1"
-    return requests.get(url, timeout=5).json()
+    if st.session_state.get("force_error", False):
+        raise Exception("Simulēta kļūda")
 
+    url = f"https://wttr.in/{city}?format=j1"
+    response = requests.get(url, timeout=5)
+
+    if response.status_code != 200:
+        raise Exception("API neatbild")
+
+    return response.json()
 
 def weather_section():
     st.subheader("Laikapstākļi")
@@ -112,8 +122,14 @@ def weather_section():
         st.write(f"Sajūta kā: **{current['FeelsLikeC']} °C**")
         st.write(f"Laikapstākļi: **{current['weatherDesc'][0]['value']}**")
 
-    except Exception:
+        if st.session_state.debug_mode:
+            st.write("RAW API dati:")
+            st.json(data)
+
+    except Exception as e:
         st.error("Nevar iegūt laikapstākļu datus")
+        if st.session_state.debug_mode:
+            st.exception(e)
 
 def homework_section():
     st.subheader("Mājasdarbi")
@@ -148,6 +164,12 @@ def chart_section():
     data = [random.randint(10, 50) for _ in range(20)]
     st.line_chart(data)
 
+def system_status_section():
+    st.subheader("Sistēmas statuss")
+    st.write("Session state:")
+    st.json(dict(st.session_state))
+    st.write("Cache aktīvs (300 sek)")
+
 col1, col2 = st.columns(2)
 
 with col1:
@@ -161,3 +183,7 @@ with col2:
         homework_section()
     if st.session_state.show_chart:
         chart_section()
+
+if st.session_state.debug_mode:
+    st.divider()
+    system_status_section()
