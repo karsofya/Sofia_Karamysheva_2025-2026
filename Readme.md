@@ -264,4 +264,9 @@ Parāda galveni
 Attēlo izvēlētās sadaļas
 Ja ieslēgts test režīms, parāda papildu rīkus
 
+# Testēšana
+Testēšanas akceptesti atrodami Testa apraksts.docx 
+Integrācijas testi atrodas
+Olivers Toms Lazarevs
+
   
