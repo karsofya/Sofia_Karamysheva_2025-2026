@@ -134,4 +134,139 @@ Darba plāns:
       *Gatavās lietotnes demonstrācija
       *Funkciju izskaidrošana
       *Secinājumi un nākotnes uzlabojumi
+
+     1. Sistēmas prasības
+
+Lai palaistu šo projektu, nepieciešams:
+
+Python 3.9 vai jaunāks
+Instalētas bibliotēkas:
+streamlit
+pandas
+requests
+Ieteicams izmantot virtuālo vidi (venv), lai izolētu projektā izmantotās bibliotēkas
+2. Instalācija
+
+Atver termināli projekta mapē un izpildi:
+
+pip install streamlit pandas requests
+
+Ja izmanto virtuālo vidi:
+
+**python -m venv venv
+venv\Scripts\activate
+pip install streamlit pandas requests**
+3. Projekta palaišana
+3.1 Parastais režīms
+streamlit run 2026_projekts.py
+
+Šis režīms paredzēts galalietotājiem. Redzama tikai pamata funkcionalitāte.
+
+3.2 Testēšanas režīms
+**streamlit run 2026_projekts.py -- --test**
+
+Šis režīms paredzēts izstrādātājiem un testēšanai.
+
+Tas aktivizē:
+
+debug režīmu
+API kļūdu simulāciju
+iespēju apskatīt iekšējo stāvokli (session state)
+iespēju atiestatīt lietotnes datus
+4. Programmas struktūra
+4.1 Session state
+
+Programma izmanto st.session_state, lai saglabātu lietotāja iestatījumus:
+
+tēma (Light / Dark)
+piezīmes
+redzamās sadaļas
+fonta un krāsu iestatījumi
+debug un testēšanas režīma iestatījumi
+4.2 Izskata sistēma
+
+Funkcija **apply_theme()** nodrošina lietotnes vizuālo noformējumu.
+
+Tā kontrolē:
+
+fona krāsu
+teksta krāsu
+fonta izmēru
+tabulu un elementu krāsas
+
+Tumšajā režīmā krāsas tiek automātiski pielāgotas.
+
+4.3 Sidebar (iestatījumi)
+
+Funkcija **sidebar():**
+
+ļauj izvēlēties Light vai Dark režīmu
+ļauj ieslēgt vai izslēgt sadaļas
+ļauj mainīt izskatu (krāsas, fontu)
+testēšanas režīmā pievieno papildu rīkus
+4.4 Header
+
+Funkcija** header()**:
+
+parāda lietotnes nosaukumu
+parāda pašreizējo datumu un laiku
+5. Funkcijas
+5.1 Laikapstākļi
+
+Funkcija: **weather_section()**
+
+iegūst datus no wttr.in API
+parāda temperatūru
+parāda “Feels like” temperatūru
+parāda laikapstākļu aprakstu
+dati tiek kešoti 300 sekundes
+5.2 Mājasdarbi
+
+Funkcija:** homework_section()**
+
+izveido tabulu ar uzdevumiem
+aprēķina dienas līdz termiņam
+pievieno statusu:
+“uzmanība”, ja termiņš tuvs
+“ok”, ja laiks pietiekams
+5.3 Piezīmes
+
+Funkcija:** notes_section()**
+
+ļauj lietotājam ievadīt tekstu
+saglabā ievadīto informāciju sesijas laikā
+5.4 Grafiks
+
+Funkcija: **chart_section()**
+
+ģenerē nejaušus datus
+attēlo līniju grafiku
+dati saglabājas sesijā
+6. Testēšanas režīms
+
+Aktivizējas tikai ar:
+
+**streamlit run 2026_projekts.py -- --test**
+
+Pieejamās funkcijas:
+
+debug režīms (parāda iekšējos datus)
+API kļūdu simulācija
+lietotnes atiestatīšana
+7. Lietotnes darbības princips
+
+Programma darbojas šādā secībā:
+
+Inicializē session state
+Pielieto vizuālo tēmu
+Ielādē sidebar iestatījumus
+Parāda galveni
+Attēlo izvēlētās sadaļas
+Ja ieslēgts test režīms, parāda papildu rīkus
+
+# Testēšana
+Testēšanas akceptesti atrodami Testa apraksts.docx 
+Integrācijas testi atrodas
+Olivers Toms Lazarevs
+
   
