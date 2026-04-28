@@ -49,6 +49,9 @@ init_state()
 
 # theme apply
 def apply_theme():
+    # LABOJUMS #2 & #3: Dark režīmā vairs netiek ignorētas custom krāsas —
+    # tās tiek lietotas vienmēr. Dark režīms tikai maina fonu/tekstu ja nav
+    # mainīts manuāli. Fonta izmērs tagad vienmēr ņem vērtību no session state.
     bg = st.session_state.background
     fc = st.session_state.font_color
     fs = st.session_state.font_size
@@ -57,11 +60,17 @@ def apply_theme():
     bc = st.session_state.table_border
 
     if st.session_state.theme == "Dark":
-        bg = "#0e1117"
-        fc = "#f0f0f0"
-        trc = "#1a1c23"
-        thc = "#1a1c23"
-        bc = "#444"
+        # Tikai ja lietotājs nav mainījis krāsas manuāli, lietojam dark noklusējumus
+        if bg == "#ffffff":
+            bg = "#0e1117"
+        if fc == "#000000":
+            fc = "#f0f0f0"
+        if trc == "#ffffff":
+            trc = "#1a1c23"
+        if thc == "#f0f0f0":
+            thc = "#1a1c23"
+        if bc == "#ddd":
+            bc = "#444"
 
     st.markdown(f"""
     <style>
@@ -103,10 +112,14 @@ def sidebar():
         st.divider()
         st.subheader("izskats")
 
+        # LABOJUMS #3: Fonta izmēra selectbox tagad izmanto session state vērtību
+        # kā sākuma indeksu, nevis vienmēr index=1
+        font_options = ["14px", "16px", "18px", "20px"]
+        current_font_index = font_options.index(st.session_state.font_size) if st.session_state.font_size in font_options else 1
         st.session_state.font_size = st.selectbox(
             "fonta izmērs",
-            ["14px", "16px", "18px", "20px"],
-            index=1
+            font_options,
+            index=current_font_index
         )
 
         st.session_state.font_color = st.color_picker("teksts", st.session_state.font_color)
@@ -133,10 +146,27 @@ sidebar()
 apply_theme()
 
 # header
+# LABOJUMS #4: Laiks atjaunojas reāllaikā ar JavaScript — bez lapas pārlādēšanas
 def header():
-    now = datetime.now()
     st.title("digitālais panelis")
-    st.markdown(f"{now.strftime('%H:%M:%S')} | {now.strftime('%d.%m.%Y')}")
+    st.markdown("""
+        <div id="clock" style="font-size:1em; margin-bottom:1rem;"></div>
+        <script>
+        function updateClock() {
+            const now = new Date();
+            const hh = String(now.getHours()).padStart(2, '0');
+            const mm = String(now.getMinutes()).padStart(2, '0');
+            const ss = String(now.getSeconds()).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const mo = String(now.getMonth() + 1).padStart(2, '0');
+            const yyyy = now.getFullYear();
+            const el = document.getElementById('clock');
+            if (el) el.innerText = hh + ':' + mm + ':' + ss + ' | ' + dd + '.' + mo + '.' + yyyy;
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+        </script>
+    """, unsafe_allow_html=True)
 
 header()
 
@@ -155,6 +185,8 @@ def weather(city, force_error=False):
     return r.json()
 
 # weather ui
+# LABOJUMS #1: Temperatūra tagad tiek parādīta atsevišķi ar st.metric
+# un papildus tekstu, lai nodrošinātu redzamību
 def weather_section():
     st.subheader("laikapstākļi")
 
@@ -162,8 +194,22 @@ def weather_section():
         data = weather("Riga,Latvia", st.session_state.force_error)
         cur = data["current_condition"][0]
 
-        st.metric("temperatūra", cur["temp_C"], delta=f"{cur['FeelsLikeC']} sajūta")
-        st.write(cur["weatherDesc"][0]["value"])
+        temp_c = cur["temp_C"]
+        feels_c = cur["FeelsLikeC"]
+        desc = cur["weatherDesc"][0]["value"]
+
+        # Rādām temperatūru gan kā metric, gan kā tekstu — lai būtu redzama jebkurā režīmā
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric(
+                label="Temperatūra",
+                value=f"{temp_c} °C",
+                delta=f"Sajūta: {feels_c} °C"
+            )
+        with col2:
+            st.markdown(f"**🌡️ {temp_c} °C**")
+            st.markdown(f"Sajūta: {feels_c} °C")
+            st.markdown(desc)
 
         if st.session_state.debug:
             st.json(data)
