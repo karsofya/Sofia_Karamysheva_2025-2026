@@ -61,18 +61,35 @@ def apply_theme():
     trc = st.session_state.table_row
     bc  = st.session_state.table_border
 
-    if st.session_state.theme == "Dark":
+    is_dark = st.session_state.theme == "Dark"
+
+    if is_dark:
         if bg  == "#ffffff":  bg  = "#0e1117"
         if fc  == "#000000":  fc  = "#f0f0f0"
         if trc == "#ffffff":  trc = "#1a1c23"
         if thc == "#f0f0f0":  thc = "#262730"
         if bc  == "#dddddd":  bc  = "#444444"
 
-    # Sidebar bg is slightly lighter than main bg in dark, slightly grey in light
-    sidebar_bg = "#1a1c23" if st.session_state.theme == "Dark" else "#f5f5f5"
-    input_bg   = "#262730" if st.session_state.theme == "Dark" else "#ffffff"
-    btn_bg     = "#3a3d4a" if st.session_state.theme == "Dark" else "#f0f2f6"
-    btn_hover  = "#4a4d5e" if st.session_state.theme == "Dark" else "#e0e2ea"
+    sidebar_bg = "#1a1c23" if is_dark else "#f5f5f5"
+    input_bg   = "#262730" if is_dark else "#ffffff"
+    btn_bg     = "#3a3d4a" if is_dark else "#f0f2f6"
+    btn_hover  = "#4a4d5e" if is_dark else "#e0e2ea"
+
+    # Glide Data Grid colour tokens
+    if is_dark:
+        gdg_bg        = "#1a1c23"
+        gdg_header_bg = "#262730"
+        gdg_text      = "#f0f0f0"
+        gdg_border    = "#444444"
+        gdg_selection = "#3a3d4a"
+        gdg_accent    = "#4a90d9"
+    else:
+        gdg_bg        = "#ffffff"
+        gdg_header_bg = "#f0f0f0"
+        gdg_text      = "#000000"
+        gdg_border    = "#dddddd"
+        gdg_selection = "#e8f0fe"
+        gdg_accent    = "#4a90d9"
 
     st.markdown(f"""
     <style>
@@ -122,20 +139,62 @@ def apply_theme():
         color: {fc} !important;
     }}
 
-    /* ── Data editor / table ── */
+    /* ══════════════════════════════════════════════════════
+       DATA EDITOR
+       The grid is painted on <canvas> via Glide Data Grid,
+       so th/td selectors have zero effect. We use two
+       approaches together:
+         1. CSS custom properties on the wrapper + children
+         2. A JS MutationObserver that sets them at runtime
+            directly on the DOM nodes GDG actually reads.
+    ══════════════════════════════════════════════════════ */
+    [data-testid="stDataEditor"],
+    [data-testid="stDataEditor"] * {{
+        --gdg-bg-cell:                {gdg_bg} !important;
+        --gdg-bg-cell-medium:         {gdg_bg} !important;
+        --gdg-bg-header:              {gdg_header_bg} !important;
+        --gdg-bg-header-has-focus:    {gdg_header_bg} !important;
+        --gdg-bg-header-hovered:      {gdg_selection} !important;
+        --gdg-text-dark:              {gdg_text} !important;
+        --gdg-text-medium:            {gdg_text} !important;
+        --gdg-text-light:             {gdg_text} !important;
+        --gdg-text-header:            {gdg_text} !important;
+        --gdg-border-color:           {gdg_border} !important;
+        --gdg-horizontal-border-color:{gdg_border} !important;
+        --gdg-accent-color:           {gdg_accent} !important;
+        --gdg-bg-search-result:       {gdg_selection} !important;
+        --gdg-link-color:             {gdg_accent} !important;
+    }}
+
+    /* Stretch the table to full card width, no inner scrollbar */
     [data-testid="stDataEditor"] {{
+        width: 100% !important;
+        min-width: 0 !important;
+    }}
+    [data-testid="stDataEditor"] > div,
+    [data-testid="stDataEditor"] > div > div {{
+        width: 100% !important;
+        overflow: visible !important;
+        background-color: {gdg_bg} !important;
+    }}
+    [data-testid="stDataEditor"] canvas {{
+        background-color: {gdg_bg} !important;
+    }}
+
+    /* Cell-edit overlay popup */
+    .glide-data-grid-portal,
+    .glide-data-grid-portal * {{
+        --gdg-bg-cell:   {gdg_bg} !important;
+        --gdg-text-dark: {gdg_text} !important;
         background-color: {input_bg} !important;
         color: {fc} !important;
-    }}
-    [data-testid="stDataEditor"] th {{
-        background-color: {thc} !important;
-        color: {fc} !important;
         border-color: {bc} !important;
     }}
-    [data-testid="stDataEditor"] td {{
-        background-color: {trc} !important;
+    .glide-data-grid-portal input,
+    .glide-data-grid-portal textarea {{
+        background-color: {input_bg} !important;
         color: {fc} !important;
-        border-color: {bc} !important;
+        border: 1px solid {bc} !important;
     }}
 
     /* ── Line chart ── */
@@ -199,6 +258,54 @@ def apply_theme():
         color: {fc} !important;
     }}
     </style>
+
+    <script>
+    /* ── JS runtime patch for Glide Data Grid ──────────────────────────
+       GDG reads CSS variables from the element it renders into, but
+       Streamlit re-mounts the component after every rerun, wiping any
+       previous inline styles. A MutationObserver re-applies the vars
+       every time GDG's DOM nodes appear or change.
+    ─────────────────────────────────────────────────────────────────── */
+    (function() {{
+        const VARS = {{
+            '--gdg-bg-cell':                 '{gdg_bg}',
+            '--gdg-bg-cell-medium':          '{gdg_bg}',
+            '--gdg-bg-header':               '{gdg_header_bg}',
+            '--gdg-bg-header-has-focus':     '{gdg_header_bg}',
+            '--gdg-bg-header-hovered':       '{gdg_selection}',
+            '--gdg-text-dark':               '{gdg_text}',
+            '--gdg-text-medium':             '{gdg_text}',
+            '--gdg-text-light':              '{gdg_text}',
+            '--gdg-text-header':             '{gdg_text}',
+            '--gdg-border-color':            '{gdg_border}',
+            '--gdg-horizontal-border-color': '{gdg_border}',
+            '--gdg-accent-color':            '{gdg_accent}',
+            '--gdg-bg-search-result':        '{gdg_selection}',
+        }};
+
+        function applyToEl(el) {{
+            Object.entries(VARS).forEach(([k, v]) => el.style.setProperty(k, v, 'important'));
+            el.style.setProperty('background-color', '{gdg_bg}', 'important');
+        }}
+
+        function patch() {{
+            /* Top-level wrapper */
+            document.querySelectorAll('[data-testid="stDataEditor"]').forEach(applyToEl);
+            /* Inner GDG stack / canvas wrapper */
+            document.querySelectorAll('.dvn-stack, .gdg-style').forEach(applyToEl);
+            /* The canvas itself */
+            document.querySelectorAll('[data-testid="stDataEditor"] canvas').forEach(c => {{
+                c.style.setProperty('background-color', '{gdg_bg}', 'important');
+            }});
+        }}
+
+        patch();
+        if (!window.__gdgObserver) {{
+            window.__gdgObserver = new MutationObserver(patch);
+            window.__gdgObserver.observe(document.body, {{ childList: true, subtree: true }});
+        }}
+    }})();
+    </script>
     """, unsafe_allow_html=True)
 
 apply_theme()
@@ -357,10 +464,15 @@ def homework_section():
 
     today = date.today()
 
+    # Dynamic height: all rows visible, no inner scrollbar
+    row_count = len(st.session_state.homework_data)
+    table_height = (row_count + 1) * 35 + 40
+
     edited = st.data_editor(
         st.session_state.homework_data,
         num_rows="dynamic",
         use_container_width=True,
+        height=table_height,
         column_config={
             "Termiņš": st.column_config.DateColumn("Termiņš", format="DD.MM.YYYY"),
         },
