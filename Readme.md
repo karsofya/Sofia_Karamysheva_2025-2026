@@ -266,7 +266,8 @@ Ja ieslēgts test režīms, parāda papildu rīkus
 
 # Testēšana
 Testēšanas akceptesti atrodami Testa apraksts.docx 
-Integrācijas testi atrodas
+Integrācijas testi atrodas tests_logic.py un palažas izmantojot commandu: python -m unittest
+
 Olivers Toms Lazarevs
 
   
